@@ -12,16 +12,16 @@ class Schema extends Factory
     use SchemaCreate;
     use SchemaChange;
 
-    const TABLE_INT = 'INT';
-    const TABLE_STRING = 'VARCHAR';
-    const TABLE_CHAR = 'CHAR';
-    const TABLE_TEXT = 'TEXT';
-    const TABLE_TINYINT = 'TINYINT';
+    const TABLE_INT          = 'INT';
+    const TABLE_STRING       = 'VARCHAR';
+    const TABLE_CHAR         = 'CHAR';
+    const TABLE_TEXT         = 'TEXT';
+    const TABLE_TINYINT      = 'TINYINT';
     const TABLE_SMALLINTEGER = 'SMALLINT';
-    const TABLE_BOOLEAN = 'BOOLEAN';
-    const TABLE_DATE = 'DATE';
+    const TABLE_BOOLEAN      = 'BOOLEAN';
+    const TABLE_DATE         = 'DATE';
 
-    const INDEX_INDEX = 'INDEX';
+    const INDEX_INDEX        = 'INDEX';
     const INDEX_UNIQUE_INDEX = 'UNIQUE KEY';
 
     /**
@@ -40,7 +40,7 @@ class Schema extends Factory
      * ];
      */
     private $table  = null;
-    public $engine = '';
+    public $engine  = '';
     private $fields = [];
     private $type   = '';
 
@@ -52,9 +52,14 @@ class Schema extends Factory
     public function setTable($table)
     {
         $this->engine = '';
-        $this->type = '';
+        $this->type   = '';
         $this->fields = [];
-        $this->table = $table;
+        $this->table  = $table;
+    }
+
+    public function getTable()
+    {
+        return $this->table;
     }
 
     public function setType($type)
@@ -62,23 +67,31 @@ class Schema extends Factory
         $this->type = $type;
     }
 
+    public function getFields()
+    {
+        $sql = "DESC {$this->getTable()}";
+        $stmt = self::getDb()->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
     public static function isExist($table)
     {
         $sql    = "SHOW TABLES LIKE '" . $table . "'";
-        $result = self::getDB()->query($sql);
+        $result = self::getDb()->query($sql);
         return count($result->fetchAll()) === 1;
     }
 
     public static function destory($table)
     {
         $sql = "DROP TABLE {$table}";
-        self::getDB()->exec($sql);
+        self::getDb()->exec($sql);
     }
 
     public static function truncate($table)
     {
         $sql = "TRUNCATE TABLE {$table}";
-        return self::getDB()->exec($sql);
+        return self::getDb()->exec($sql);
     }
 
     public function run()
@@ -152,5 +165,4 @@ class Schema extends Factory
         $sql = rtrim($sql, ',');
         return $sql . ");";
     }
-
 }

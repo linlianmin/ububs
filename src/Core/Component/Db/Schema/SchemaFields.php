@@ -3,6 +3,13 @@ namespace Ububs\Core\Component\Db\Schema;
 
 trait SchemaFields
 {
+
+    public static function table($table)
+    {
+        self::getInstance()->setTable($table);
+        return self::getInstance();
+    }
+
     public function increments(string $field)
     {
         $this->fields[$field] = [
