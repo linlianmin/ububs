@@ -27,9 +27,21 @@ php7 + swoole常驻内存框架
 
 ## 用法实例 ##
 <pre>
-// 框架初始化
-php bin/ububs.php install
-
-// 启动服务
-php bin/ububs.php server:start
+ // 框架安装，一件部署
+ php bin/ububs.php install
+ 
+ // server 相关命令
+ php bin/ububs.php server:start
+ php bin/ububs.php server:stop
+ php bin/ububs.php server:restart
+ 
+ // 数据库迁移
+ php bin/ububs.php db:migration
+ php bin/ububs.php db:migration refresh
+ php bin/ububs.php db:migration --目录名
+ 
+ // 填充数据
+ php bin/ububs.php db:seed
+ php bin/ububs.php db:seed refresh
+ php bin/ububs.php db:seed --目录名
 </pre>

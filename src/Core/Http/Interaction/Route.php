@@ -1,4 +1,5 @@
 <?php
+
 namespace Ububs\Core\Http\Interaction;
 
 use Ububs\Core\Component\Middleware\Adapter\VerifyCsrfToken;
@@ -35,14 +36,18 @@ class Route extends Factory
         }
 
         // csrf 验证
-        if (!$csrfResult = VerifyCsrfToken::getInstance()->checkCsrf()) {
+        if (!$cr = VerifyCsrfToken::getInstance()->checkCsrf()) {
             return Response::error(StatusCode::CODE_UNAUTHORIZED);
         }
 
         // 中间件验证
-        $middleware = isset($routers['middleware']) ? $routers['middleware'] : [];
-        if (!$mr = Middleware::validate($middleware)) {
-            return Response::error(StatusCode::CODE_UNAUTHORIZED);
+        $middleware = isset($routers['middleware']) ? (array) $routers['middleware'] : [];
+        $mr =  Middleware::validate($middleware);
+        \file_put_contents("/tmp/test.txt", $mr, FILE_APPEND);
+        if (!$mr || \is_array($mr)) {
+            $rc = $mr[0] ?? StatusCode::CODE_UNAUTHORIZED;
+            $rm = $mr[1] ?? '';
+            return Response::error($rc, $rm);
         }
         $actions               = isset($routers['action']) ? $routers['action'] : '';
         $this->actionNamespace = isset($routers['namespace']) ? $routers['namespace'] : '';

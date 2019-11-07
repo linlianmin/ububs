@@ -1,4 +1,5 @@
 <?php
+
 namespace Ububs\Core\Http\Interaction;
 
 use Ububs\Core\Http\Interaction\Route;
@@ -176,17 +177,17 @@ class Request
         return $result;
     }
 
-    public function getActionController()
+    public static function getActionController()
     {
         return Route::$actionController;
     }
 
-    public function getActionMethod()
+    public static function getActionMethod()
     {
         return Route::$actionMethod;
     }
 
-    public function getActionNamespace()
+    public static function getActionNamespace()
     {
         return Route::$actionNamespace;
     }

@@ -1,4 +1,5 @@
 <?php
+
 use Ububs\Core\Http\Interaction\Request;
 use Ububs\Core\Http\Interaction\Response;
 use Ububs\Core\Swoole\Server\ServerManager;
@@ -98,9 +99,13 @@ function webpackLoad($filePath)
 {
     $target  = APP_ROOT . '/public/' . dirname(str_replace('\\', '/', $filePath));
     $files   = new \DirectoryIterator($target);
-    $fileArr = explode('.', basename($filePath));
+    $name = basename($filePath);
+    $fileDatas = [];
+    $pos = strpos($name, '.');
+    $fileDatas[] = mb_substr($name, 0, $pos);
+    $fileDatas[] = mb_substr($name, $pos);
     $result  = $lastModifyTime  = '';
-    if (count($fileArr) !== 2) {
+    if (count($fileDatas) !== 2) {
         return $result;
     }
 
@@ -109,12 +114,11 @@ function webpackLoad($filePath)
         if ($file->isDot() || $file->isDir()) {
             continue;
         }
-        $pattern = '/^' . $fileArr[0] . '.*\.' . $fileArr[1] . '$/';
+        $pattern = '/^' . $fileDatas[0] . '.*' . $fileDatas[1] . '$/';
         if (preg_match($pattern, $file->getFilename())) {
             if (!$lastModifyTime || $file->getCTime() > $lastModifyTime) {
                 $lastModifyTime = $file->getCTime();
                 $result         = $file->getFilename();
-                // $result         = $file->getPathname();
             }
         }
     }
@@ -185,7 +189,8 @@ function authcode($string, $key = '', $operation = '', $expiry = 0)
     if ($operation == 'decrypt') {
         // 验证数据有效性，请看未加密明文的格式
         if ((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) &&
-            substr($result, 10, 16) == substr(md5(substr($result, 26) . $keyb), 0, 16)) {
+            substr($result, 10, 16) == substr(md5(substr($result, 26) . $keyb), 0, 16)
+        ) {
             return substr($result, 26);
         } else {
             return '';

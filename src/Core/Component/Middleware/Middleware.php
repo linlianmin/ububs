@@ -1,4 +1,5 @@
 <?php
+
 namespace Ububs\Core\Component\Middleware;
 
 use Ububs\Core\Component\Factory;
@@ -16,11 +17,16 @@ class Middleware extends Factory
             foreach ($middlewares as $middleware) {
                 if (!isset($mis[$middleware])) {
                     if (empty($mis)) {
-                        throw new \Exception("Never exists {$Middleware} Middleware", 1);
+                        throw new \Exception("Never exists {$middleware} Middleware", 1);
                     }
                 }
-                if (!$rs = (new $mis[$middleware])->handle()) {
+                $obj = (new $mis[$middleware]);
+                $rs = $obj->handle();
+                if (!$rs) {
                     return false;
+                }
+                if (is_numeric($rs) && isset($obj->codeMessage[$rs])) {
+                    return [false, $obj->codeMessage[$rs]];
                 }
             }
         }
