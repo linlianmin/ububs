@@ -1,4 +1,5 @@
 <?php
+
 namespace Ububs\Core\Swoole\Server\Adapter;
 
 use Ububs\Core\Component\Db\Db;
@@ -6,7 +7,6 @@ use Ububs\Core\Http\Interaction\Request;
 use Ububs\Core\Http\Interaction\Response;
 use Ububs\Core\Http\Interaction\Route;
 use Ububs\Core\Swoole\Factory;
-use Ububs\Core\Tool\Config;
 
 class Http extends Factory
 {
@@ -24,7 +24,7 @@ class Http extends Factory
         if (!\extension_loaded('swoole')) {
             throw new \Exception("no swoole extension. get: https://github.com/swoole/swoole-src");
         }
-        $config       = config('server.swoole_http_server');
+        $config       = config('app.swoole_http_server');
         self::$server = new \Swoole_http_server($config['host'], $config['port']);
         self::$server->set(
             array(
@@ -36,9 +36,11 @@ class Http extends Factory
                 'task_worker_num'          => $config['task_worker_num'],
                 'heartbeat_check_interval' => $config['heartbeat_check_interval'],
                 'heartbeat_idle_time'      => $config['heartbeat_idle_time'],
+                'log_file'                 => $config['log_file'],
+                'daemonize'                => $config['daemonize'],
             )
         );
-        $this->setClient(config('server.swoole_callback_client'));
+        $this->setClient(config('app.swoole_callback_client'));
     }
 
     public function getServer()
@@ -79,12 +81,10 @@ class Http extends Factory
     public function onWorkerStart($serv, $worker_id)
     {
         // 判定是否为Task Worker进程
-        if ($worker_id >= self::$server->setting['worker_num']) {
-
-        }
-        if ($worker_id == 0) {
-            cli_set_process_title('php manager work');
-        }
+        if ($worker_id >= self::$server->setting['worker_num']) { }
+        // if ($worker_id == 0) {
+        //     cli_set_process_title('php manager work');
+        // }
         // 连接数据库
 
         if (self::$client !== null && method_exists(self::$client, 'onWorkerStart')) {
@@ -93,9 +93,7 @@ class Http extends Factory
     }
 
     public function onWorkerError(swoole_server $serv, int $worker_id, int $worker_pid, int $exit_code, int $signal)
-    {
-
-    }
+    { }
 
     /**
      * request动作回调
@@ -193,12 +191,12 @@ class Http extends Factory
      */
     final public static function exceptionHandler($exception)
     {
-        $errorData = [
+        $d = \json_encode([
             'status'  => ERROR_STATUS,
             'message' => $exception,
-        ];
-        Log::info($errorData);
-        return Response::json($errorData);
+        ]);
+        Log::info($d);
+        return Response::end($d);
     }
 
     /**
@@ -207,14 +205,14 @@ class Http extends Factory
     final public static function shutdownHandler()
     {
         $error     = \error_get_last();
-        $errorData = [
+        $d = \json_encode([
             'status'  => ERROR_STATUS,
             'message' => $error['message'],
             'file'    => $error['file'],
             'line'    => $error['line'],
-        ];
-        Log::info($errorData);
-        return Response::json($errorData);
+        ]);
+        Log::info($d);
+        return Response::end($d);
     }
 
     /**
@@ -222,14 +220,13 @@ class Http extends Factory
      */
     final public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
-        $errorData = [
+        $d = \json_encode([
             'status'  => ERROR_STATUS,
             'message' => $errstr,
             'file'    => $errfile,
             'line'    => $errline,
-        ];
-        Log::info($errorData);
-        return Response::json($errorData);
+        ]);
+        Log::info($d);
+        return Response::end($d);
     }
-
 }

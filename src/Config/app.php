@@ -6,8 +6,9 @@ return [
         'host'                     => '0.0.0.0',
         'port'                     => '9501',
         'worker_num'               => 2,
-        'daemonize'                => false,
+        'daemonize'                => true,
         'max_request'              => 10000,
+        'log_file'                 => '/tmp/swoole.log',
         // 抢占模式
         'dispatch_mode'            => 3,
         'debug_mode'               => 1,
@@ -18,4 +19,5 @@ return [
         'heartbeat_idle_time'      => 300,
     ],
     'swoole_websocket_server' => [],
+    'log_file' => '/tmp/ububs.log'
 ];

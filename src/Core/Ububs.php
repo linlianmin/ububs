@@ -1,4 +1,5 @@
 <?php
+
 namespace Ububs\Core;
 
 use Ububs\Core\Swoole\Server\ServerManager;
@@ -14,23 +15,22 @@ class Ububs
     {
         switch ($type) {
             case self::TYPE_SERVER:
-                $this->runServer($action);
+                $this->runServer($action, $params);
                 break;
 
             case self::TYPE_DB:
                 $this->runDb($action, $params);
                 break;
         }
-        
     }
-    public function runServer($action)
+    public function runServer($action, $params)
     {
-    	ServerManager::getInstance()->$action();
-    	EventManager::getInstance()->parseCommand($action, $params);
+        ServerManager::getInstance()->$action();
+        EventManager::getInstance()->parseCommand($action, $params);
     }
 
     public function runDb($action, $params)
     {
-    	Db::getInstance()->$action();
+        Db::getInstance()->$action();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Ububs\Core\Swoole\Server;
 
 class ServerManager
@@ -25,7 +26,7 @@ class ServerManager
         if (isset(self::$serverInstance)) {
             return self::$serverInstance;
         }
-        self::$serverType = strtoupper(config('server.server_type'));
+        self::$serverType = strtoupper(config('app.server_type'));
         switch (self::$serverType) {
             case self::SWOOLE_HTTP_SERVER:
                 self::$serverInstance = \Ububs\Core\Swoole\Server\Adapter\Http::getInstance();
@@ -54,7 +55,5 @@ class ServerManager
     }
 
     public function reload()
-    {
-
-    }
+    { }
 }

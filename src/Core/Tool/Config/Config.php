@@ -1,4 +1,5 @@
 <?php
+
 namespace Ububs\Core\Tool\Config;
 
 class Config
@@ -7,7 +8,7 @@ class Config
     public static $config;
 
     private function __construct()
-    {}
+    { }
 
     /**
      * 获取配置
@@ -81,7 +82,7 @@ class Config
             }
             $fileArr = dir_tree($configDir, "/.php$/");
             if (!empty($fileArr)) {
-                foreach ($fileArr as $dir => $filenameArr) {
+                foreach ($fileArr as $dir => $files) {
                     array_map(function ($filename) use (&$config, $dir) {
                         $filePath = $dir . DS . $filename;
                         if (function_exists("opcache_invalidate")) {
@@ -90,7 +91,7 @@ class Config
                         $configKey          = basename($filename, ".php");
                         $configContent      = include "{$filePath}";
                         $config[$configKey] = isset($config[$configKey]) ? array_merge($config[$configKey], $configContent) : $configContent;
-                    }, $filenameArr);
+                    }, $files);
                 }
             }
         }
