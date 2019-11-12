@@ -2,9 +2,7 @@
 
 namespace Ububs\Core;
 
-use Ububs\Core\Swoole\Server\ServerManager;
 use FwSwoole\Component\Db\Db;
-use Ububs\Core\Swoole\Event\EventManager;
 
 class Ububs
 {
@@ -23,10 +21,9 @@ class Ububs
                 break;
         }
     }
+
     public function runServer($action, $params)
     {
-        ServerManager::getInstance()->$action();
-        EventManager::getInstance()->parseCommand($action, $params);
     }
 
     public function runDb($action, $params)

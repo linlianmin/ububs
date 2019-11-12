@@ -97,14 +97,14 @@ function generatePassword($password)
  */
 function webpackLoad($filePath)
 {
-    $target  = APP_ROOT . '/public/' . dirname(str_replace('\\', '/', $filePath));
-    $files   = new \DirectoryIterator($target);
-    $name = basename($filePath);
-    $fileDatas = [];
-    $pos = strpos($name, '.');
+    $target      = APP_ROOT . '/public/' . dirname(str_replace('\\', '/', $filePath));
+    $files       = new \DirectoryIterator($target);
+    $name        = basename($filePath);
+    $fileDatas   = [];
+    $pos         = strpos($name, '.');
     $fileDatas[] = mb_substr($name, 0, $pos);
     $fileDatas[] = mb_substr($name, $pos);
-    $result  = $lastModifyTime  = '';
+    $result      = $lastModifyTime      = '';
     if (count($fileDatas) !== 2) {
         return $result;
     }
@@ -127,7 +127,7 @@ function webpackLoad($filePath)
 
 /**
  * 获取用户真实ip
- * @return string 
+ * @return string
  */
 function getRealIp()
 {

@@ -1,42 +1,50 @@
 <?php
 namespace Ububs\Core\Swoole\Event;
+
+use Ububs\Core\Swoole\Factory;
 use Ububs\Core\Swoole\Server\ServerManager;
 
-
-class EventManager
+class EventManager extends Factory
 {
-
-    private static $instance;
-    private $registerEventsLists = [
-        'swoole_http_server' => [
-            
-            'Start' => 'onStart',
+    private static $registerEvents = [
+        'HTTP_SERVER'      => [
+            'Start'       => 'onStart',
             'WorkerStart' => 'onWorkerStart',
             'WorkerError' => 'onWorkerError',
-            'Request' => 'onRequest',
-            'Task' => 'onTask',
-            'Finish' => 'onFinish'
+            'Request'     => 'onRequest',
+            'Task'        => 'onTask',
+            'Finish'      => 'onFinish',
         ],
-        'swoole_server' => [],
-        'swoole_websocket_server' => []
+        'SWOOLE_SERVER'    => [],
+        'WEBSOCKET_SERVER' => [
+            'Open'    => 'onOpen',
+            'Message' => 'onMessage',
+            'Request' => 'onRequest',
+            'Task'    => 'onTask',
+            'Close'   => 'onClose',
+        ],
     ];
 
-    public static function getInstance()
+    public static function addEventListener()
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new EventManager();
-        }
-        return self::$instance;
-    }
 
-    public function addEventListener()
-    {
-        $type = ServerManager::getInstance()->getServerType();
-        $server = ServerManager::getInstance()->getServer();
-        $events = $this->registerEventsLists[strtolower($type)];
+        $type   = ServerManager::getServerType();
+        $events = self::$registerEvents[$type] ?? [];
+        if ($type === 'WEBSOCKET_SERVER' && !config('app.server')['http']) {
+            unset($events['Request']);
+        }
         if (!empty($events)) {
+            $server   = ServerManager::getServer();
+            $instance = ServerManager::getCallbackClient();
             foreach ($events as $event => $callback) {
-                $server->on($event, [ServerManager::getInstance()->getServerInstance(), $callback]);
+                if ($event === 'Request') {
+                    $server->on($event, [ServerManager::getServerInstance(), $callback]);
+                } else {
+                    if (!method_exists($instance, $callback)) {
+                        continue;
+                    }
+                    $server->on($event, [$instance, $callback]);
+                }
             }
         }
     }

@@ -7,9 +7,11 @@ use Ububs\Core\Swoole\Server\ServerManager;
 class TaskManager extends Factory
 {
 
+    const SERVER_TYPE = 'HTTP_SERVER';
+
     public function task($name, $callback, $taskId = -1)
     {
-        return ServerManager::getInstance()->getServer()->task($name, $taskId, $callback);
+        return ServerManager::getServer(self::SERVER_TYPE)->task($name, $taskId, $callback);
     }
 
 }
