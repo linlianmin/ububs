@@ -8,6 +8,7 @@ class EventManager extends Factory
 {
     private static $registerEvents = [
         'HTTP_SERVER'      => [
+            'BeforeStart' => 'beforeStart',
             'Start'       => 'onStart',
             'WorkerStart' => 'onWorkerStart',
             'WorkerError' => 'onWorkerError',
@@ -17,17 +18,21 @@ class EventManager extends Factory
         ],
         'SWOOLE_SERVER'    => [],
         'WEBSOCKET_SERVER' => [
-            'Open'    => 'onOpen',
-            'Message' => 'onMessage',
-            'Request' => 'onRequest',
-            'Task'    => 'onTask',
-            'Close'   => 'onClose',
+            'BeforeStart' => 'beforeStart',
+            'Start'       => 'onStart',
+            'WorkerStart' => 'onWorkerStart',
+            'WorkerError' => 'onWorkerError',
+            'Request'     => 'onRequest',
+            'Task'        => 'onTask',
+            'Finish'      => 'onFinish',
+            'Open'        => 'onOpen',
+            'Message'     => 'onMessage',
+            'Close'       => 'onClose',
         ],
     ];
 
     public static function addEventListener()
     {
-
         $type   = ServerManager::getServerType();
         $events = self::$registerEvents[$type] ?? [];
         if ($type === 'WEBSOCKET_SERVER' && !config('app.server')['http']) {
@@ -39,10 +44,13 @@ class EventManager extends Factory
             foreach ($events as $event => $callback) {
                 if ($event === 'Request') {
                     $server->on($event, [ServerManager::getServerInstance(), $callback]);
+                }
+                if (!method_exists($instance, $callback)) {
+                    continue;
+                }
+                if ($event === 'BeforeStart') {
+                    $instance->$callback($server);
                 } else {
-                    if (!method_exists($instance, $callback)) {
-                        continue;
-                    }
                     $server->on($event, [$instance, $callback]);
                 }
             }

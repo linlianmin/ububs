@@ -26,6 +26,7 @@ define('DS', DIRECTORY_SEPARATOR);
 define('UBUBS_ROOT', __DIR__ . '/../src/');
 // define('APP_ROOT', realpath(getcwd()));
 define('APP_ROOT', __DIR__ . '/../../../../');
+define('ERROR_STATUS', 0);
 
 // composer 自动加载类
 foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
@@ -242,7 +243,7 @@ class Client
      * @param  int           $signal     [description]
      * @return [type]                    [description]
      */
-    public function onWorkerError(swoole_server $serv, int $worker_id, int $worker_pid, int $exit_code, int $signal)
+    public function onWorkerError($serv, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {}
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Ububs\Core\Swoole\Server;
 
+use Ububs\Core\Component\Log\Log;
+use Ububs\Core\Http\Interaction\Response;
 use Ububs\Core\Swoole\Factory;
 
 class ServerManager extends Factory

@@ -16,14 +16,14 @@ class DbQuery extends Factory
 
     protected static $db = null;
 
-    protected $table   = null;
-    protected $selects = '*';
+    protected $table    = null;
+    protected $selects  = '*';
     protected $minField = '';
     protected $maxField = '';
-    protected $updates = [];
-    protected $wheres  = [];
-    protected $limit   = [];
-    protected $orders  = [];
+    protected $updates  = [];
+    protected $wheres   = [];
+    protected $limit    = [];
+    protected $orders   = [];
 
     protected static $conditions = ['=', 'like', '<', '>', '<=', '>=', '!=', '<>', 'in', 'not in', 'between', 'not between'];
 

@@ -1,15 +1,13 @@
 <?php
 namespace Ububs\Core\Component\Auth;
 
-use Ububs\Core\Http\Interaction\Request;
 use Ububs\Core\Component\Db\Db;
-use Ububs\Core\Component\Factory;
 use Ububs\Core\Component\Middleware\Adapter\JWTAuth;
 
 class Auth
 {
     private static $instance = null;
-    private $table = null;
+    private $table           = null;
 
     public static function getInstance($table = 'user')
     {
@@ -20,16 +18,16 @@ class Auth
         return self::$instance;
     }
 
-
     /**
      * 指定登录表
      * @param  string $table 表名
      * @return object
      */
-    public static function guard($table = 'user')
+    public static function guard(string $table = 'user')
     {
-        $this->table = $table;
-        return self::getInstance();
+        $instance        = self::getInstance();
+        $instance->table = $table;
+        return $instance;
     }
 
     /**
@@ -56,7 +54,7 @@ class Auth
             $account  => $loginData[$account],
             $password => generatePassword($loginData[$password]),
         ];
-        $list       = Db::table($this->table)->where($wheres)->first();
+        $list = Db::table($this->table)->where($wheres)->first();
         if (empty($list)) {
             $this->table = null;
             return $result;
