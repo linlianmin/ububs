@@ -8,7 +8,7 @@ class Config
     public static $config;
 
     private function __construct()
-    { }
+    {}
 
     /**
      * 获取配置
@@ -88,9 +88,22 @@ class Config
                         if (function_exists("opcache_invalidate")) {
                             \opcache_invalidate($filePath);
                         }
-                        $configKey          = basename($filename, ".php");
-                        $configContent      = include "{$filePath}";
-                        $config[$configKey] = isset($config[$configKey]) ? array_merge($config[$configKey], $configContent) : $configContent;
+                        $name = basename($filename, ".php");
+                        $cs   = include "{$filePath}";
+                        if (isset($config[$name])) {
+                            foreach ($config[$name] as $key => $value) {
+                                if (!isset($cs[$key])) {
+                                    continue;
+                                }
+                                if (is_array($config[$name][$key])) {
+                                    $config[$name][$key] = array_merge($config[$name][$key], $cs[$key]);
+                                } else {
+                                    $config[$name][$key] = $cs[$key];
+                                }
+                            }
+                        } else {
+                            $config[$name] = $cs;
+                        }
                     }, $files);
                 }
             }

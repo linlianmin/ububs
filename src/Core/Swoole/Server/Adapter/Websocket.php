@@ -12,22 +12,33 @@ class Websocket extends ServerManager
 
     public function init()
     {
-        $configs      = config('app.server');
-        self::$server = new \swoole_websocket_server($configs['host'], $configs['port']);
-        self::$server->set(
-            array(
-                'worker_num'               => $configs['worker_num'],
-                'daemonize'                => $configs['daemonize'],
-                'max_request'              => $configs['max_request'],
-                'dispatch_mode'            => $configs['dispatch_mode'],
-                'debug_mode'               => $configs['debug_mode'],
-                'task_worker_num'          => $configs['task_worker_num'],
-                'heartbeat_check_interval' => $configs['heartbeat_check_interval'],
-                'heartbeat_idle_time'      => $configs['heartbeat_idle_time'],
-                'log_file'                 => $configs['log_file'],
-                'daemonize'                => $configs['daemonize'],
-            )
-        );
+        $configs = config('app.server');
+        if (isset($configs['sock_type'][1])) {
+            self::$server = new \swoole_websocket_server($configs['host'], $configs['port'], $configs['mode'], $configs['sock_type'][0] | $configs['sock_type'][1]);
+        } elseif (isset($configs['sock_type'][0])) {
+            self::$server = new \swoole_websocket_server($configs['host'], $configs['port'], $configs['mode'], $configs['sock_type'][0]);
+        } else {
+            self::$server = new \swoole_websocket_server($configs['host'], $configs['port'], $configs['mode']);
+        }
+        $sets = [
+            'worker_num'               => $configs['worker_num'],
+            'daemonize'                => $configs['daemonize'],
+            'max_request'              => $configs['max_request'],
+            'dispatch_mode'            => $configs['dispatch_mode'],
+            'debug_mode'               => $configs['debug_mode'],
+            'task_worker_num'          => $configs['task_worker_num'],
+            'heartbeat_check_interval' => $configs['heartbeat_check_interval'],
+            'heartbeat_idle_time'      => $configs['heartbeat_idle_time'],
+            'log_file'                 => $configs['log_file'],
+            'daemonize'                => $configs['daemonize'],
+        ];
+        if (!empty($configs['ssl_cert_file'])) {
+            $sets['ssl_cert_file'] = $configs['ssl_cert_file'];
+        }
+        if (!empty($configs['ssl_key_file'])) {
+            $sets['ssl_key_file'] = $configs['ssl_key_file'];
+        }
+        self::$server->set($sets);
     }
 
     public function getSwooleServer()
